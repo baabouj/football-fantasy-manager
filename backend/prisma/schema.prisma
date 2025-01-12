@@ -12,3 +12,32 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
+
+  team Team?
+}
+
+model Team {
+  id     String @id @default(cuid())
+  name   String
+  budget Float  @default(5000000)
+
+  ownerId String @unique
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  players Player[]
+}
+
+model Player {
+  id       String @id @default(cuid())
+  name     String
+  position String
+  price    Float
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id])
+}
