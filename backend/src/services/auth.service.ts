@@ -28,6 +28,6 @@ export const authService = {
       hashedPassword
     );
 
-    return { user: createdUser, isFistTime: true };
+    return { user: createdUser, isFirstTime: true };
   },
 };
