@@ -1,8 +1,8 @@
-import pino from 'pino';
+import pino from "pino";
 
-import { app } from './app';
+import { app } from "./app";
 
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 const logger = pino();
 
