@@ -1,11 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { isAxiosError } from "axios";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { axios } from "@/lib/axios";
 
-export default function LoginRegisterPage() {
+export default function LoginPage() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -17,45 +23,40 @@ export default function LoginRegisterPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    const res = await fetch(`http://localhost:4000/auth/login`, {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      await axios.post(`/auth/login`, { email, password });
 
-    const body = await res.json();
+      router.push("/team");
+    } catch (error) {
+      if (isAxiosError(error)) {
+        const data = error.response?.data;
+        if (data?.errors) {
+          // Input validation failed
+          setErrors({
+            email:
+              data.errors.find(
+                (err: { input: string }) => err.input === "email"
+              )?.error ?? "",
+            password:
+              data.errors.find(
+                (err: { input: string }) => err.input === "password"
+              )?.error ?? "",
+          });
+        } else {
+          // wrong password
 
-    if (res.ok) {
-      console.log("You have successfully logged in!!");
-
-      // TODO: navigate to the team page
+          setErrors({ email: "", password: data?.message });
+        }
+      } else {
+        setErrors({ email: "", password: "An unexpected error occurred" });
+      }
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    if (body.errors) {
-      // Input validation failed
-      setErrors({
-        email:
-          body.errors.find((err: { input: string }) => err.input === "email")
-            ?.error ?? "",
-        password:
-          body.errors.find((err: { input: string }) => err.input === "password")
-            ?.error ?? "",
-      });
-    } else {
-      // wrong password
-
-      setErrors({ email: "", password: body.message });
-    }
-
-    setIsLoading(false);
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <main className="flex min-h-screen items-center justify-center">
       <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md">
         <h1 className="text-2xl font-bold text-center">Login / Register</h1>
         <div className="space-y-2">
@@ -95,6 +96,6 @@ export default function LoginRegisterPage() {
           {isLoading ? "Processing..." : "Submit"}
         </Button>
       </form>
-    </div>
+    </main>
   );
 }
