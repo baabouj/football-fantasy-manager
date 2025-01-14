@@ -1,6 +1,9 @@
 import { userService } from "./user.service";
 import { hash } from "../lib/hash";
 
+import { fork } from "child_process";
+import path from "path";
+
 export const authService = {
   login: async (email: string, password: string) => {
     const user = await userService.findByEmail(email);
@@ -27,6 +30,10 @@ export const authService = {
       email,
       hashedPassword
     );
+
+    // handle team creation in a separate process
+    const worker = fork(path.join(__dirname, "../workers/team.worker.ts"));
+    worker.send({ userId: createdUser.id });
 
     return { user: createdUser, isFirstTime: true };
   },
