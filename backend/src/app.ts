@@ -14,6 +14,7 @@ import { errorHandler } from "./middlewares/error-handler.middleware";
 import { authRouter } from "./routes/auth.route";
 import { teamRouter } from "./routes/team.route";
 import { transfersRouter } from "./routes/transfers.route";
+import { pino } from "./config/pino";
 
 const app = express();
 
@@ -37,6 +38,8 @@ app.options("*", cors());
 
 app.use(passport.initialize());
 passport.use("jwt", jwtStrategy);
+
+app.use(pino);
 
 // Routes
 app.use("/auth", authRouter);
