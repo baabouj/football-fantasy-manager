@@ -1,7 +1,6 @@
 import Axios from "axios";
 
-// Create an Axios instance
 export const axios = Axios.create({
-  baseURL: "http://localhost:4000", // Replace with your API URL
+  baseURL: "http://localhost:4000",
   withCredentials: true, // Include cookies in requests
 });

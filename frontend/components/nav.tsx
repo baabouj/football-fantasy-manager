@@ -22,6 +22,15 @@ export function Nav() {
         >
           Team
         </Link>
+        <Link
+          href="/transfer"
+          className={cn(
+            "hover:underline",
+            pathname === "/transfer" && "font-bold underline"
+          )}
+        >
+          Transfer Market
+        </Link>
       </div>
     </nav>
   );
