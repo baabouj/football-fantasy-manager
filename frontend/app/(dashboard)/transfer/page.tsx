@@ -7,6 +7,8 @@ import { isAxiosError } from "axios";
 import { PlayerCard } from "@/components/player-card";
 import { FilterBar, type Filters } from "@/components/filter-bar";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import TransferLoading from "./loading";
 
 import { useToast } from "@/hooks/use-toast";
 import { useTeamsStore } from "@/data/team";
@@ -15,15 +17,16 @@ import { axios } from "@/lib/axios";
 import { type Player } from "@/lib/types";
 
 export default function TransferMarketPage() {
-  const [players, setPlayers] = useState<Player[]>();
-  const [filters, setFilters] = useState<Filters>();
+  const router = useRouter();
 
   const { setTeam } = useTeamsStore();
   const { toast } = useToast();
 
-  const router = useRouter();
+  const [players, setPlayers] = useState<Player[]>();
+  const [filters, setFilters] = useState<Filters>();
+
   useEffect(() => {
-    async function fetchPosts() {
+    async function fetchTransfers() {
       try {
         const { data } = await axios.get<Player[]>("/transfers", {
           params: filters,
@@ -34,7 +37,7 @@ export default function TransferMarketPage() {
         router.push("/");
       }
     }
-    fetchPosts();
+    fetchTransfers();
   }, [filters, router]);
 
   const buyPlayer = async (playerId: string) => {
@@ -58,30 +61,48 @@ export default function TransferMarketPage() {
     }
   };
 
-  if (!players) return "Loading....";
+  if (!players) {
+    return <TransferLoading />;
+  }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Transfer Market</h1>
-      <FilterBar onFilter={setFilters} />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {players.map((player) => (
-          <PlayerCard
-            key={player.id}
-            name={player.name}
-            position={player.position}
-            price={player.askingPrice}
-            actionButton={
-              <Button
-                size="sm"
-                onClick={async () => await buyPlayer(player.id)}
-              >
-                Buy
-              </Button>
-            }
-          />
-        ))}
-      </div>
+      <h1 className="text-3xl font-bold">Transfer Market</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>Filter Players</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FilterBar onFilter={setFilters} />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Available Players</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {players.map((player) => (
+              <PlayerCard
+                key={player.id}
+                name={player.name}
+                position={player.position}
+                price={player.askingPrice}
+                form={player.form}
+                team={player.team?.name}
+                actionButton={
+                  <Button
+                    size="sm"
+                    onClick={async () => await buyPlayer(player.id)}
+                  >
+                    Buy
+                  </Button>
+                }
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

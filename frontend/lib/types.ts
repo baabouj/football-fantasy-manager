@@ -15,7 +15,9 @@ export type Player = {
   position: Position;
   price: number;
   askingPrice: number;
+  form: number;
   teamId: string;
+  team?: Team;
   isInTransferList: boolean;
 };
 
