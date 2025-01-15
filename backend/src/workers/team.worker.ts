@@ -45,5 +45,6 @@ function generatePlayers(position: string, count: number) {
     }),
     position,
     price: faker.number.int({ min: 100000, max: 5000000 }),
+    form: faker.number.int({ min: 60, max: 99 }),
   }));
 }

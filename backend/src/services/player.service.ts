@@ -10,7 +10,7 @@ import { type TransferQuery } from "../validations/transfers.validation";
 
 export const playerService = {
   createMany: async (
-    players: { name: string; position: string; price: number }[],
+    players: { name: string; position: string; price: number; form: number }[],
     teamId: string
   ) => {
     const createdTeam = await prisma.player.createMany({
@@ -51,6 +51,13 @@ export const playerService = {
             lte: price,
           },
         }),
+      },
+      include: {
+        team: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
     return players;
@@ -109,8 +116,8 @@ export const playerService = {
     }
   },
   transfer: async (playerId: string, userId: string) => {
-    const team = await teamService.find(userId);
-    if (!team)
+    const buyerTeam = await teamService.find(userId);
+    if (!buyerTeam)
       throw new HttpError(httpStatus.BAD_REQUEST, "Please create a team");
 
     try {
@@ -119,7 +126,7 @@ export const playerService = {
           id: playerId,
           isInTransferList: true,
           teamId: {
-            not: team.id,
+            not: buyerTeam.id,
           },
         },
         include: {
@@ -134,28 +141,40 @@ export const playerService = {
       if (!player)
         throw new HttpError(httpStatus.BAD_REQUEST, "Player doesn't exist");
 
-      if (team.budget - player.askingPrice < 0)
+      // Calculate the purchase price (95% of asking price)
+      const purchasePrice = player.askingPrice * 0.95;
+
+      if (buyerTeam.budget < purchasePrice)
         throw new HttpError(
           httpStatus.BAD_REQUEST,
           "Team budget is not enough to buy this player"
         );
 
+      // Transfer player to buyer's team
       await prisma.player.update({
         where: {
           id: playerId,
         },
         data: {
-          teamId: team.id,
+          teamId: buyerTeam.id,
           isInTransferList: false,
-          price: player.askingPrice,
+          price: purchasePrice,
+          askingPrice: purchasePrice,
         },
       });
 
-      await teamService.updateBudget(team.id, team.budget - player.askingPrice); // the buyer team budget
+      // Deduct price from buyer's budget
+      await teamService.updateBudget(
+        buyerTeam.id,
+        buyerTeam.budget - purchasePrice
+      );
+
+      // Add price to seller's budget
       await teamService.updateBudget(
         player.teamId,
-        player.team.budget + player.askingPrice
-      ); // the seller team budget
+        player.team.budget + purchasePrice
+      );
+
       return player;
     } catch (error) {
       if (
