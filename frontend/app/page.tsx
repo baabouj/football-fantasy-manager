@@ -8,10 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { axios } from "@/lib/axios";
+import { useUsersStore } from "@/data/user";
+import { User } from "@/lib/types";
 
 export default function LoginPage() {
   const router = useRouter();
 
+  const { setUser } = useUsersStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -24,7 +27,11 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await axios.post(`/auth/login`, { email, password });
+      const { data } = await axios.post<User>(`/auth/login`, {
+        email,
+        password,
+      });
+      setUser(data);
 
       router.push("/team");
     } catch (error) {

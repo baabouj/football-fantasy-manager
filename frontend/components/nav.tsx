@@ -1,11 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
+import { useUsersStore } from "@/data/user";
+import { axios } from "@/lib/axios";
 
 export function Nav() {
+  const router = useRouter();
   const pathname = usePathname();
+
+  const { setUser } = useUsersStore();
+
+  const logout = async () => {
+    try {
+      await axios.post("/auth/logout");
+      setUser(undefined);
+      router.push("/");
+    } catch {
+      setUser(undefined);
+      router.push("/");
+    }
+  };
 
   return (
     <nav className="flex justify-between items-center p-4">
@@ -31,6 +48,9 @@ export function Nav() {
         >
           Transfer Market
         </Link>
+        <Button variant="outline" onClick={logout}>
+          Logout
+        </Button>
       </div>
     </nav>
   );
