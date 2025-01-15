@@ -33,11 +33,13 @@ model Team {
 }
 
 model Player {
-  id       String @id @default(cuid())
-  name     String
-  position String
-  price    Float
+  id               String  @id @default(cuid())
+  name             String
+  position         String
+  price            Float
+  askingPrice      Float
+  isInTransferList Boolean @default(false)
 
-  teamId String?
-  team   Team?   @relation(fields: [teamId], references: [id])
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id])
 }

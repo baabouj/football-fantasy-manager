@@ -13,6 +13,7 @@ import { errorHandler } from "./middlewares/error-handler.middleware";
 
 import { authRouter } from "./routes/auth.route";
 import { teamRouter } from "./routes/team.route";
+import { transfersRouter } from "./routes/transfers.route";
 
 const app = express();
 
@@ -40,6 +41,7 @@ passport.use("jwt", jwtStrategy);
 // Routes
 app.use("/auth", authRouter);
 app.use("/team", teamRouter);
+app.use("/transfers", transfersRouter);
 
 // Error handling
 app.use((_req, _res, next) => {

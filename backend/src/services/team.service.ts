@@ -22,4 +22,13 @@ export const teamService = {
     });
     return createdTeam;
   },
+  updateBudget: async (teamId: string, budget: number) => {
+    const team = await prisma.team.update({
+      where: { id: teamId },
+      data: {
+        budget,
+      },
+    });
+    return team;
+  },
 };
