@@ -24,7 +24,7 @@ export const authController = {
         res.clearCookie(ACCESS_TOKEN_COOKIE_NAME, {
           secure: true,
           httpOnly: true,
-          sameSite: "lax",
+          sameSite: "none",
         });
       }
 
@@ -32,7 +32,7 @@ export const authController = {
       res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
         secure: true,
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "none",
         maxAge: 60 * 60 * 1000, // 1h
       });
 
