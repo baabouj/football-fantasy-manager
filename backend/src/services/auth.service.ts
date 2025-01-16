@@ -32,7 +32,11 @@ export const authService = {
     );
 
     // handle team creation in a separate process
-    const worker = fork(path.join(__dirname, "../workers/team.worker.ts"));
+    const workerPath =
+      process.env.NODE_ENV === "production"
+        ? path.join(__dirname, "../workers/team.worker.js") // Production (built files)
+        : path.join(__dirname, "../workers/team.worker.ts"); // Development (source files)
+    const worker = fork(workerPath);
     worker.send({ userId: createdUser.id });
 
     return { user: createdUser, isFirstTime: true };
