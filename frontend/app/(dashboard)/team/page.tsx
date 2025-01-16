@@ -33,7 +33,8 @@ export default function TeamManagementPage() {
       } catch (error) {
         if (isAxiosError(error) && error.response?.status === 401) {
           router.push("/");
-        } else {
+        }
+        if (!isAxiosError(error)) {
           clearInterval(interval);
         }
       }
