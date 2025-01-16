@@ -1,6 +1,7 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { formatter } from "@/lib/utils";
 
 type PlayerCardProps = {
   name: string;
@@ -49,7 +50,7 @@ export function PlayerCard({
           </p>
         )}
         <p className="font-semibold text-primary mb-2">
-          ${(price / 1_000_000).toFixed(2)}M
+          {formatter.format(price)}
         </p>
         <Progress value={form} className="h-1.5" />
       </CardContent>

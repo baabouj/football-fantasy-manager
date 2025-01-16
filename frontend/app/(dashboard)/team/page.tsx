@@ -18,6 +18,7 @@ import { axios } from "@/lib/axios";
 import type { Team } from "@/lib/types";
 
 import { useTeamsStore } from "@/data/team";
+import { formatter } from "@/lib/utils";
 
 export default function TeamManagementPage() {
   const { team, setTeam } = useTeamsStore();
@@ -71,7 +72,7 @@ export default function TeamManagementPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${(team.budget / 1000000).toFixed(2)}M
+              {formatter.format(team.budget)}
             </div>
           </CardContent>
         </Card>
